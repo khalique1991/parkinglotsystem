@@ -1,0 +1,33 @@
+package com.parkinglotsystem.entity;
+
+import com.parkinglotsystem.enums.SpotType;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "parking_spot")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ParkingSpot {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "spot_number", nullable = false)
+    private String spotNumber;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private SpotType type;
+
+    @Column(name = "occupied")
+    private boolean occupied;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parking_lot_id")
+    private ParkingLot parkingLot;
+}
+
