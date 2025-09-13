@@ -5,5 +5,6 @@ import com.parkinglotsystem.entity.Vehicle;
 
 public interface TicketService {
     Ticket createEntry(Vehicle vehicle);
+    Ticket createEntry(String vehicleNumber, String vehicleType); // overload
     Ticket closeTicket(Long ticketId);
 }

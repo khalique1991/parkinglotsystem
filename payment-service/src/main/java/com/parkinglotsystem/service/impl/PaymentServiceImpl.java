@@ -17,12 +17,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment processPayment(Long ticketId, BigDecimal amount) {
-        // for now assume payment always succeeds
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+
         Payment payment = Payment.builder()
                 .ticketId(ticketId)
                 .amount(amount)
                 .status(PaymentStatus.COMPLETED)
-                .paymentTime(Instant.now())
                 .build();
 
         return paymentRepository.save(payment);

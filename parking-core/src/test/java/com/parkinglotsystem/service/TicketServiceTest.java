@@ -1,24 +1,19 @@
 package com.parkinglotsystem.service;
 
 import com.parkinglotsystem.entity.*;
+import com.parkinglotsystem.enums.PaymentStatus;
 import com.parkinglotsystem.enums.TicketStatus;
 import com.parkinglotsystem.enums.VehicleType;
 import com.parkinglotsystem.repository.TicketRepository;
 import com.parkinglotsystem.repository.VehicleRepository;
-import com.parkinglotsystem.repository.ParkingSpotRepository;
 import com.parkinglotsystem.service.impl.TicketServiceImpl;
-import com.parkinglotsystem.service.impl.SimpleSpotAssigner;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 
+import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -31,10 +26,11 @@ public class TicketServiceTest {
         // Mock dependencies
         VehicleRepository vehicleRepo = Mockito.mock(VehicleRepository.class);
         TicketRepository ticketRepo = Mockito.mock(TicketRepository.class);
-        SpotAssigner spotAssigner = Mockito.mock(SpotAssigner.class); // <-- mock this, not real SimpleSpotAssigner
+        SpotAssigner spotAssigner = Mockito.mock(SpotAssigner.class); //
+        PaymentService paymentService= Mockito.mock(PaymentService.class);// <-- mock this, not real SimpleSpotAssigner
 
         // Service under test
-        TicketServiceImpl service = new TicketServiceImpl(ticketRepo, vehicleRepo, spotAssigner);
+        TicketServiceImpl service = new TicketServiceImpl(ticketRepo, vehicleRepo, spotAssigner,paymentService);
 
         // Arrange vehicle
         Vehicle vehicle = Vehicle.builder()
@@ -81,36 +77,33 @@ public class TicketServiceTest {
 
     @Test
     void testCloseTicket() {
-        VehicleRepository vehicleRepo = Mockito.mock(VehicleRepository.class);
         TicketRepository ticketRepo = Mockito.mock(TicketRepository.class);
-        ParkingSpotRepository spotRepo = Mockito.mock(ParkingSpotRepository.class);
-        SimpleSpotAssigner spotAssigner = new SimpleSpotAssigner(spotRepo);
+        VehicleRepository vehicleRepo = Mockito.mock(VehicleRepository.class);
+        SpotAssigner spotAssigner = Mockito.mock(SpotAssigner.class);
+        PaymentService paymentService = Mockito.mock(PaymentService.class);
 
+        TicketServiceImpl service = new TicketServiceImpl(ticketRepo, vehicleRepo, spotAssigner, paymentService);
 
-        TicketServiceImpl service = new TicketServiceImpl(ticketRepo, vehicleRepo, spotAssigner);
-
-
-        Ticket t = Ticket.builder()
+        Ticket activeTicket = Ticket.builder()
                 .id(1L)
-                .vehicleId(1L)
+                .vehicleId(100L)
                 .spotId(10L)
-                .entryTime(Instant.now().minus(2, ChronoUnit.HOURS)) // ✅ Instant
+                .entryTime(Instant.now().minusSeconds(3600)) // 1 hour ago
                 .status(TicketStatus.ACTIVE)
                 .build();
-        ParkingSpot s = ParkingSpot.builder().id(10L).spotNumber("A1").occupied(true).build();
 
+        Mockito.when(ticketRepo.findById(1L)).thenReturn(Optional.of(activeTicket));
+        Mockito.when(ticketRepo.save(Mockito.any(Ticket.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
 
-        Mockito.when(ticketRepo.findById(1L)).thenReturn(Optional.of(t));
-        Mockito.when(ticketRepo.save(Mockito.any())).thenAnswer(i -> i.getArguments()[0]);
-        Mockito.when(spotRepo.findById(10L)).thenReturn(Optional.of(s));
-        Mockito.when(spotRepo.save(Mockito.any())).thenAnswer(i -> i.getArguments()[0]);
-
+        Mockito.when(paymentService.processPayment(Mockito.eq(1L), Mockito.any(BigDecimal.class)))
+                .thenReturn(Payment.builder().id(50L).ticketId(1L).amount(BigDecimal.TEN).status(PaymentStatus.COMPLETED).build());
 
         Ticket closed = service.closeTicket(1L);
 
-
-        assertThat(closed.getStatus()).isEqualTo(TicketStatus.PAID);
-        assertThat(closed.getAmount()).isGreaterThan(0);
-        assertThat(s.isOccupied()).isFalse();
+        assertNotNull(closed.getExitTime());
+        assertEquals(TicketStatus.CLOSED, closed.getStatus());
+        Mockito.verify(spotAssigner).releaseSpot(10L);
+        Mockito.verify(paymentService).processPayment(Mockito.eq(1L), Mockito.any(BigDecimal.class));
     }
 }
