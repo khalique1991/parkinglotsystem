@@ -1,26 +1,30 @@
 package com.parkinglotsystem.controller;
 
 import com.parkinglotsystem.entity.Ticket;
-import com.parkinglotsystem.entity.Vehicle;
 import com.parkinglotsystem.service.TicketService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/tickets")
+@RequestMapping("/tickets")
 @RequiredArgsConstructor
 public class TicketController {
+
     private final TicketService ticketService;
+
+    // Vehicle entry
     @PostMapping("/entry")
-    public ResponseEntity<Ticket> createEntry(@RequestBody Vehicle vehicle) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.createEntry(vehicle));
+    public ResponseEntity<Ticket> createEntry(@RequestParam String vehicleNumber,
+                                              @RequestParam String vehicleType) {
+        Ticket ticket = ticketService.createEntry(vehicleNumber, vehicleType);
+        return ResponseEntity.ok(ticket);
     }
 
-
-    @PostMapping("/exit/{ticketId}")
+    // Vehicle exit (just closes ticket, does NOT trigger payment)
+    @PostMapping("/{ticketId}/exit")
     public ResponseEntity<Ticket> closeTicket(@PathVariable Long ticketId) {
-        return ResponseEntity.ok(ticketService.closeTicket(ticketId));
+        Ticket ticket = ticketService.closeTicket(ticketId);
+        return ResponseEntity.ok(ticket);
     }
 }
