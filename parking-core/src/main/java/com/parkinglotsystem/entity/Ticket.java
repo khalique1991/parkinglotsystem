@@ -2,9 +2,12 @@ package com.parkinglotsystem.entity;
 
 import com.parkinglotsystem.enums.TicketStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-
+import java.math.BigDecimal;
 import java.time.Instant;
 
 
@@ -29,7 +32,7 @@ public class Ticket {
     private Instant exitTime;
 
 
-    private Double amount;
+    private BigDecimal amount;
 
 
     @Enumerated(EnumType.STRING)

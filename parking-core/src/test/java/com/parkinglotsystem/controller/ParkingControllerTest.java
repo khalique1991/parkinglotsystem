@@ -10,8 +10,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
@@ -26,11 +26,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ParkingControllerTest {
 
     @Autowired
-   private MockMvc mockMvc;
+    private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    // ✅ correct
     private ParkingService parkingService;
 
     @Test
@@ -40,30 +41,33 @@ public class ParkingControllerTest {
                 .name("Lot A")
                 .location("Downtown")
                 .build();
-        Mockito.when(parkingService.createParkingLot(Mockito.any())).thenReturn(parkingLot);
-        mockMvc.perform(post("/api/parking/parkinglots").contentType(MediaType.APPLICATION_JSON)
+
+        Mockito.when(parkingService.createParkingLot(Mockito.any()))
+                .thenReturn(parkingLot);
+
+        mockMvc.perform(post("/api/parking/parkinglots")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(parkingLot)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Lot A"));
     }
 
-        @Test
-        void testGetAvailableSpots() throws Exception {
-            ParkingSpot parkingSpot= ParkingSpot.builder()
-                    .id(100L)
-                    .spotNumber("A1")
-                    .type(SpotType.SMALL)
-                    .occupied(false)
-                    .build();
-            Mockito.when(parkingService.findAvailableSpots(1L))
-                    .thenReturn(Collections.singletonList(parkingSpot));
-            mockMvc.perform(get("/api/parking/lots/1/available-spots"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[0].spotNumber").value("A1"))
-                    .andExpect(jsonPath("$[0].occupied").value(false));
+    @Test
+    void testGetAvailableSpots() throws Exception {
+        ParkingSpot parkingSpot = ParkingSpot.builder()
+                .id(100L)
+                .spotNumber("A1")
+                .type(SpotType.SMALL)
+                .occupied(false)
+                .build();
 
+        Mockito.when(parkingService.findAvailableSpots(1L))
+                .thenReturn(Collections.singletonList(parkingSpot));
 
+        mockMvc.perform(get("/api/parking/lots/1/available-spots"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].spotNumber").value("A1"))
+                .andExpect(jsonPath("$[0].occupied").value(false));
     }
-
 }

@@ -1,7 +1,7 @@
 package com.parkinglotsystem.service;
 
 import com.parkinglotsystem.entity.Payment;
-import com.parkinglotsystem.enums.PaymentStatus;
+import com.parkinglotsystem.entity.PaymentStatus;
 import com.parkinglotsystem.repository.PaymentRepository;
 import com.parkinglotsystem.service.impl.PaymentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
