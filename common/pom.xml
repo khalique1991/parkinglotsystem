@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Inherit from parent -->
     <parent>
         <groupId>com.parkinglotsystem</groupId>
         <artifactId>parkinglotsystem</artifactId>
@@ -14,24 +12,27 @@
     </parent>
 
     <artifactId>common</artifactId>
+    <name>common</name>
     <packaging>jar</packaging>
 
-    <name>Parking Lot System - Common Module</name>
-    <description>Shared utilities, DTOs, and constants for all services</description>
-
     <dependencies>
-        <!-- Lombok for boilerplate code (already in parent, but here in case we want only common to use it) -->
+        <!-- Spring Boot Web for @RestControllerAdvice, ResponseEntity, etc. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
-        <!-- (Optional) JSON handling for shared DTOs -->
+        <!-- For validation annotations like @Valid -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
     </dependencies>
-
 </project>

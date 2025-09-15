@@ -5,109 +5,114 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- Spring Boot parent to inherit dependency management -->
+	<!-- Spring Boot parent -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.5</version>
-		<relativePath/>
+		<version>3.2.5</version> <!-- ✅ latest stable at the time -->
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>com.parkinglotsystem</groupId>
 	<artifactId>parkinglotsystem</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>pom</packaging> <!-- Parent should be pom, not jar -->
-
+	<packaging>pom</packaging>
 	<name>Parking Lot System</name>
-	<description>Spring Boot based Parking Lot System (Multi-Module)</description>
+	<description>Spring Boot Microservices for Parking Lot System</description>
 
+	<!-- All child modules -->
 	<modules>
 		<module>common</module>
 		<module>parking-core</module>
+		<module>payment-service</module>
+		<module>ticket-service</module>
 		<module>reservation-service</module>
 		<module>session-service</module>
 		<module>reporting-service</module>
-		<module>payment-service</module>
 		<module>user-service</module>
 		<module>notification-service</module>
 		<module>edge-gateway</module>
 	</modules>
 
+	<!-- Common properties -->
 	<properties>
 		<java.version>17</java.version>
-		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<spring-cloud.version>2023.0.3</spring-cloud.version> <!-- optional if using Spring Cloud -->
+		<spring.boot.version>3.2.5</spring.boot.version>
+		<lombok.version>1.18.32</lombok.version>
 	</properties>
 
+	<!-- Centralized version management -->
 	<dependencyManagement>
 		<dependencies>
-			<!-- Spring Cloud BOM (only if microservices use Spring Cloud) -->
+			<!-- internal modules -->
 			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
+				<groupId>com.parkinglotsystem</groupId>
+				<artifactId>common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.parkinglotsystem</groupId>
+				<artifactId>parking-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<!-- Spring Boot Starters -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-jpa</artifactId>
+				<version>${spring.boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-security</artifactId>
+				<version>${spring.boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${spring.boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-webflux</artifactId>
+				<version>${spring.boot.version}</version>
+			</dependency>
+
+			<!-- Lombok -->
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.32</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<!-- Testing -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${spring.boot.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.projectreactor</groupId>
+				<artifactId>reactor-test</artifactId>
+				<version>3.6.2</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-test</artifactId>
+				<version>6.2.4</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
-	<dependencies>
-		<!-- Common dependencies for all child modules -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-
-		<!-- Pick only ONE of these, unless you truly want both -->
-		<!--<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<!-- Test dependencies -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-
+	<!-- Common plugin configuration for all modules -->
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!-- Ensures Boot plugin is available in child modules -->
-				<plugin>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-maven-plugin</artifactId>
-				</plugin>
-
-				<!-- Enforce Java version -->
+				<!-- Compiler plugin -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -115,10 +120,22 @@
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+								<version>1.18.32</version>
+							</path>
+						</annotationProcessorPaths>
 					</configuration>
+				</plugin>
+				<!-- Spring Boot plugin -->
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring.boot.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
-
 </project>
