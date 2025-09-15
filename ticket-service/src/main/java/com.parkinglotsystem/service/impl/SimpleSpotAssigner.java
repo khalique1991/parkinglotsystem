@@ -1,6 +1,7 @@
 package com.parkinglotsystem.service.impl;
 
 import com.parkinglotsystem.entity.ParkingSpot;
+import com.parkinglotsystem.enums.SpotType;
 import com.parkinglotsystem.repository.ParkingSpotRepository;
 import com.parkinglotsystem.service.SpotAssigner;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +14,15 @@ public class SimpleSpotAssigner implements SpotAssigner {
 
     @Override
     public ParkingSpot assignAvailableSpot(String vehicleType) {
-        ParkingSpot spot = parkingSpotRepository.findFirstByOccupiedFalse()
-                .orElseThrow(() -> new RuntimeException("No available spots"));
+        SpotType spotType = SpotType.valueOf(vehicleType.toUpperCase());
+
+        ParkingSpot spot = parkingSpotRepository.findFirstByTypeAndOccupiedFalse(spotType)
+                .orElseThrow(() -> new RuntimeException("No available spots for type: " + spotType));
+
         spot.setOccupied(true);
         return parkingSpotRepository.save(spot);
     }
+
 
     @Override
     public void releaseSpot(Long spotId) {
