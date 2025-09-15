@@ -3,6 +3,7 @@ package com.parkinglotsystem.service.impl;
 import com.parkinglotsystem.entity.ParkingSpot;
 import com.parkinglotsystem.entity.Ticket;
 import com.parkinglotsystem.entity.Vehicle;
+import com.parkinglotsystem.enums.SpotType;
 import com.parkinglotsystem.enums.TicketStatus;
 import com.parkinglotsystem.repository.ParkingSpotRepository;
 import com.parkinglotsystem.repository.TicketRepository;
@@ -48,9 +49,10 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Ticket createEntry(String vehicleNumber, String vehicleType) {
+        SpotType spotType = SpotType.valueOf(vehicleType.toUpperCase());
         Vehicle vehicle = Vehicle.builder()
                 .licensePlate(vehicleNumber)
-                .type(vehicleType)
+                .type(spotType.name())
                 .build();
         return createEntry(vehicle);
     }

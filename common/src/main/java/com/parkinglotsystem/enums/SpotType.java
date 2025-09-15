@@ -1,5 +1,6 @@
 package com.parkinglotsystem.enums;
 
 public enum SpotType {
-    SMALL, MEDIUM, LARGE
+    FOUR_WHEELER,
+    TWO_WHEELER
 }

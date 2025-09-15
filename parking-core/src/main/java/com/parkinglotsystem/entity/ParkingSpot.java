@@ -23,7 +23,7 @@ public class ParkingSpot {
     private String spotNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column(name = "spot_type", nullable = false)   // ✅ changed from "type" → "spot_type"
     private SpotType type;
 
     @Column(name = "occupied")
