@@ -17,7 +17,7 @@
         <!-- Depend on parking-core to use entities & repositories -->
         <dependency>
             <groupId>com.parkinglotsystem</groupId>
-            <artifactId>parking-core</artifactId>
+            <artifactId>parking-service</artifactId>
             <version>${project.version}</version>
         </dependency>
 

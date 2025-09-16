@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>com.parkinglotsystem</groupId>
-            <artifactId>parking-core</artifactId>
+            <artifactId>parking-service</artifactId>
         </dependency>
     </dependencies>
 </project>

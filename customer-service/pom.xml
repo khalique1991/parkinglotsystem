@@ -10,14 +10,13 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>parking-api</artifactId>
+    <artifactId>customer-service</artifactId>
     <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.version>0.0.1-SNAPSHOT</project.version>
     </properties>
     <dependencies>
         <!-- Persistence -->
@@ -43,10 +42,6 @@
         <dependency>
             <groupId>com.parkinglotsystem</groupId>
             <artifactId>common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.parkinglotsystem</groupId>
-            <artifactId>parking-core</artifactId>
         </dependency>
 
         <!-- ✅ Test dependencies -->
@@ -74,11 +69,17 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.parkinglotsystem</groupId>
-            <artifactId>ticket-service</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <artifactId>common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
-
 </project>
