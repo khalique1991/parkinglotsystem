@@ -11,7 +11,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>parking-core</artifactId>
+    <artifactId>parking-service</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>

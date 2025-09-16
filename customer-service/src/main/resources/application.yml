@@ -1,0 +1,44 @@
+server:
+  port: 8081
+
+#spring:
+#  application:
+#    name: customer-service
+#
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/parking_lot
+#    username: postgres
+#    password: postgres
+#    driver-class-name: org.postgresql.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update   # (create, update, validate, none)
+#    show-sql: true
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#
+#logging:
+#  level:
+#    org.springframework: INFO
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+spring:
+  datasource:
+    url: jdbc:h2:mem:parkinglotdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+openapi:
+  title: Customer Microservice API
+  description: API documentation for Customer service
+  version: 1.0.0
+  group: customers
+  security:
+    enabled: true
