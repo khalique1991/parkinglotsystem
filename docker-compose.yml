@@ -1,112 +1,69 @@
 services:
-  # --- Database Layer ---
+  vault:
+    image: hashicorp/vault:1.16.2
+    container_name: vault-dev
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+    command: "server -dev -dev-root-token-id=root"
+    networks:
+      - parking-net
+
   postgres:
     image: postgres:15
-    container_name: postgres-db
+    container_name: parking-postgres
     environment:
+      POSTGRES_DB: parkingdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: parking_lot
+      POSTGRES_PASSWORD: root
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     networks:
       - parking-net
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
+  auth-service:
+    build:
+      context: .       # MUST be project root so Docker sees all modules
+      dockerfile: auth-service/Dockerfile
+    container_name: auth-service
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@parking.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
+      SPRING_PROFILES_ACTIVE: docker
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: root
     depends_on:
+      - vault
       - postgres
+    ports:
+      - "8081:8081"
     networks:
       - parking-net
 
-  # --- Messaging Layer ---
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.0
-    container_name: zookeeper
+  customer-service:
+    build:
+      context: .       # MUST be project root so Docker sees all modules
+      dockerfile: customer-service/Dockerfile
+    container_name: customer-service
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    ports:
-      - "2181:2181"
-    networks:
-      - parking-net
-
-  kafka:
-    image: confluentinc/cp-kafka:7.4.0
-    container_name: kafka
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-    ports:
-      - "9092:9092"
-      - "9093:9093"
+      SPRING_PROFILES_ACTIVE: docker
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: root
     depends_on:
-      - zookeeper
-    networks:
-      - parking-net
-
-  # --- Cache Layer ---
-  redis:
-    image: redis:7
-    container_name: redis
+      - vault
+      - postgres
+      - auth-service
     ports:
-      - "6379:6379"
+      - "8088:8088"
     networks:
       - parking-net
-
-  # --- Monitoring Layer (Optional, Enterprise) ---
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    networks:
-      - parking-net
-
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    networks:
-      - parking-net
-
-  # --- Logging Layer (Optional, Enterprise) ---
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    ports:
-      - "9200:9200"
-    networks:
-      - parking-net
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.6.2
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    networks:
-      - parking-net
-
-volumes:
-  postgres_data:
 
 networks:
   parking-net:
+
+volumes:
+  postgres-data:

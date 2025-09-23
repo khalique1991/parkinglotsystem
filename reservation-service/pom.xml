@@ -33,9 +33,5 @@
             <groupId>com.parkinglotsystem</groupId>
             <artifactId>common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.parkinglotsystem</groupId>
-            <artifactId>parking-service</artifactId>
-        </dependency>
     </dependencies>
 </project>

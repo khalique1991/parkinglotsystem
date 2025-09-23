@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.controller;
 
 import com.parkinglotsystem.entity.Payment;
@@ -37,3 +38,4 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.getAllPayments());
     }
 }
+*/

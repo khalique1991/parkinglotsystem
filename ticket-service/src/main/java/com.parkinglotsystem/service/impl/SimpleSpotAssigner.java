@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.service.impl;
 
 import com.parkinglotsystem.entity.ParkingSpot;
@@ -33,3 +34,4 @@ public class SimpleSpotAssigner implements SpotAssigner {
     }
 
 }
+*/

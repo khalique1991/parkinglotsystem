@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.repository;
 
 
@@ -11,3 +12,4 @@ public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Lo
     // find method by name (CASH, CARD, UPI, etc.)
     Optional<PaymentMethod> findByMethodName(String methodName);
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.repository;
 
 import com.parkinglotsystem.entity.Payment;
@@ -14,3 +15,4 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // find payments by status (SUCCESS, FAILED, etc.)
     List<Payment> findByStatus(String status);
 }
+*/

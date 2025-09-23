@@ -1,0 +1,12 @@
+server:
+  port: 8888
+jwt:
+  secret: your-super-long-secret-key-that-is-at-least-64-characters-long-1234567890
+  expirationMs: 3600000
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/parkinglotsystem/config-repo
+          clone-on-start: true

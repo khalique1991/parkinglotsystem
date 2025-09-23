@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.service.impl;
 
 import com.parkinglotsystem.entity.ParkingSpot;
@@ -62,3 +63,4 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reservation Not found" + id));
     }
 }
+*/
