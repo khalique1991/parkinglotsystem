@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.service.impl;
 
 import com.parkinglotsystem.entity.Payment;
@@ -59,3 +60,4 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
 }
+*/

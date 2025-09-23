@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.service;
 
 import com.parkinglotsystem.entity.Payment;
@@ -14,3 +15,4 @@ public interface PaymentService {
     Payment getPaymentByTicket(Long ticketId);
     List<Payment> getAllPayments();
 }
+*/

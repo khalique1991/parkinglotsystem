@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.service.impl;
 
 import com.parkinglotsystem.entity.ParkingSpot;
@@ -84,3 +85,4 @@ public class TicketServiceImpl implements TicketService {
         return saved;
     }
 }
+*/

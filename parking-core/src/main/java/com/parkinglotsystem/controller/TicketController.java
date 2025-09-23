@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.controller;
 
 import com.parkinglotsystem.entity.Ticket;
@@ -25,3 +26,4 @@ public class TicketController {
     }
 }
 
+*/

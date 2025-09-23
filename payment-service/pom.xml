@@ -17,10 +17,10 @@
 
     <dependencies>
         <!-- Core entities -->
-        <dependency>
+        <!--<dependency>
             <groupId>com.parkinglotsystem</groupId>
             <artifactId>parking-service</artifactId>
-        </dependency>
+        </dependency>-->
 
         <!-- Spring Boot starters -->
         <dependency>
@@ -44,10 +44,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.parkinglotsystem</groupId>
-            <artifactId>parking-service</artifactId>
         </dependency>
     </dependencies>
 </project>

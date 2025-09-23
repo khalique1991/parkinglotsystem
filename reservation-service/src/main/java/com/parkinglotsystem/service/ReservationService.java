@@ -1,3 +1,4 @@
+/*
 package com.parkinglotsystem.service;
 
 
@@ -10,3 +11,4 @@ public interface ReservationService {
     Reservation getActiveReservations();
     Reservation getReservationById(Long id);
 }
+*/
