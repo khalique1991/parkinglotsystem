@@ -2,10 +2,13 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: auth-service
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/parkingdb
-    username: ${db.username}
-    password: ${db.password}
+    url: jdbc:postgresql://postgres:5432/parkingdb   # use postgres service name
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -17,15 +20,17 @@ spring:
 
   cloud:
     vault:
+      scheme: http
       uri: ${VAULT_ADDR:http://127.0.0.1:8200}
       token: ${VAULT_TOKEN:root}
       kv:
         enabled: true
         backend: secret
+      fail-fast: false
 
 jwt:
-  secret: ${jwt.secret}
-  expirationMs: ${jwt.expirationMs}
+  secret: ${JWT_SECRET:cGhzSmpSNXhRVXMyTTh2MVIweTl6S3FMNmFZd0I3blRnVnhjRjhkaEpxUjlzVmJXbU4wZVh5WjFyUTJ0VQ==}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
 
 openapi:
   title: Auth Service API
@@ -34,5 +39,3 @@ openapi:
   group: auth-api
   security:
     enabled: true
-
-

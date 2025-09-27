@@ -22,7 +22,7 @@ import java.util.List;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @PostMapping
+    @PostMapping("/create")
     @Operation(summary = "Create a new customer", description = "Adds a new customer to the system")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Customer created successfully"),
@@ -38,7 +38,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    //@PreAuthorize("hasAuthority('USER')")
     @Operation(summary = "Get customer by ID", description = "Retrieve a single customer by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Customer found"),

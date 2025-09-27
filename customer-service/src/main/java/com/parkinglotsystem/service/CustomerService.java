@@ -19,6 +19,7 @@ public class CustomerService {
 
     public CustomerResponseDTO saveCustomer(CustomerRequestDTO requestDTO) {
         Customer customer = CustomerMapper.toEntity(requestDTO);
+        System.out.println("Saving customer: " + customer.getFirstName() + " " + customer.getPhoneNumber());
         Customer saved = repository.save(customer);
         return CustomerMapper.toDTO(saved);
     }
