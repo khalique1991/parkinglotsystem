@@ -2,9 +2,10 @@ package com.parkinglotsystem.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.security.WeakKeyException;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,10 +17,23 @@ public class JwtUtils {
     private final long expirationMs;
 
     public JwtUtils(JwtProperties jwtProperties) {
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        // 1️⃣ Try to decode Base64 secret
+        Key tempKey;
+        try {
+            byte[] keyBytes = Base64.getDecoder().decode(jwtProperties.getSecret());
+            tempKey = Keys.hmacShaKeyFor(keyBytes);
+        } catch (IllegalArgumentException | WeakKeyException e) {
+            // 2️⃣ If decoding fails or key too weak, generate a strong HS512 key
+            System.out.println("⚠️ Weak or invalid JWT key detected. Generating a new strong HS512 key.");
+            tempKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+            System.out.println("🔑 Generated new strong key (Base64): " +
+                    Base64.getEncoder().encodeToString(tempKey.getEncoded()));
+        }
+        this.key = tempKey;
         this.expirationMs = jwtProperties.getExpirationMs();
     }
 
+    // ================== Token Generation ==================
     public String generateToken(String username, Set<String> roles) {
         String token = Jwts.builder()
                 .setSubject(username)
@@ -36,6 +50,7 @@ public class JwtUtils {
         return generateToken(username, Collections.singleton(role));
     }
 
+    // ================== Token Parsing ==================
     public String getUsernameFromToken(String token) {
         return parseClaims(token).getSubject();
     }
@@ -48,6 +63,7 @@ public class JwtUtils {
         return Collections.emptyList();
     }
 
+    // ================== Token Validation ==================
     public boolean validateToken(String token) {
         try {
             parseClaims(token);
@@ -67,6 +83,22 @@ public class JwtUtils {
     }
 
     private Claims parseClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    // ================== Debug Helper ==================
+    public void printTokenDetails(String token) {
+        try {
+            Claims claims = parseClaims(token);
+            System.out.println("Subject: " + claims.getSubject());
+            System.out.println("Roles: " + claims.get("roles"));
+            System.out.println("Expiration: " + claims.getExpiration());
+        } catch (Exception e) {
+            System.out.println("❌ Invalid token: " + e.getMessage());
+        }
     }
 }
