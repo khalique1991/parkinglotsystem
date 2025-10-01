@@ -5,7 +5,6 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.WeakKeyException;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
