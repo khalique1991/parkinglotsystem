@@ -6,6 +6,7 @@ import com.parkinglotsystem.entity.Customer;
 import com.parkinglotsystem.mapper.CustomerMapper;
 import com.parkinglotsystem.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
