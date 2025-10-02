@@ -1,11 +1,21 @@
+server:
+  port: 8084
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/parkinglot
-    username: postgres
-    password: password
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:parkingdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
-server:
-  port: 8081
+
+jwt:
+  secret: ${JWT_SECRET:cGhzSmpSNXhRVXMyTTh2MVIweTl6S3FMNmFZd0I3blRnVnhjRjhkaEpxUjlzVmJXbU4wZVh5WjFyUTJ0VQ==}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
+vehicle:
+  service:
+    url: http://vehicle-service:8083
