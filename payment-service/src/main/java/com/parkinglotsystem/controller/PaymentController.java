@@ -1,41 +1,29 @@
-/*
 package com.parkinglotsystem.controller;
 
-import com.parkinglotsystem.entity.Payment;
 import com.parkinglotsystem.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/api/payments")
 @RequiredArgsConstructor
 public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // 🔹 Process a new payment for a ticket
+    /**
+     * REST endpoint to process a payment
+     */
     @PostMapping
-    public ResponseEntity<Payment> processPayment(@RequestParam Long ticketId,
-                                                  @RequestParam BigDecimal amount) {
-        Payment payment = paymentService.processPayment(ticketId, amount);
-        return ResponseEntity.ok(payment);
-    }
-
-    // 🔹 Get payment details by ticketId
-    @GetMapping("/{ticketId}")
-    public ResponseEntity<Payment> getPaymentByTicket(@PathVariable Long ticketId) {
-        Payment payment = paymentService.getPaymentByTicket(ticketId);
-        return ResponseEntity.ok(payment);
-    }
-
-    // 🔹 List all payments (admin/reporting use case)
-    @GetMapping
-    public ResponseEntity<List<Payment>> getAllPayments() {
-        return ResponseEntity.ok(paymentService.getAllPayments());
+    public ResponseEntity<String> makePayment(
+            @RequestParam Long reservationId,
+            @RequestParam Long parkingSessionId,
+            @RequestParam Double amount
+    ) {
+        paymentService.processPayment(reservationId, parkingSessionId, amount);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Payment processed successfully for reservation " + reservationId);
     }
 }
-*/

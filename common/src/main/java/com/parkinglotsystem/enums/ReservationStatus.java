@@ -1,7 +1,8 @@
 package com.parkinglotsystem.enums;
 
 public enum ReservationStatus {
-    ACTIVE,
-    COMPLETED,
-    CANCELLED
+    PENDING,
+    CONFIRMED,
+    CANCELLED,
+    PAID
 }

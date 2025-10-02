@@ -15,11 +15,6 @@
     <description>Handles parking ticket lifecycle</description>
     <dependencies>
         <!-- Depend on parking-core to use entities & repositories -->
-        <dependency>
-            <groupId>com.parkinglotsystem</groupId>
-            <artifactId>parking-service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- Spring Boot starter dependencies (just as example, adjust if already present) -->
 
@@ -61,19 +56,26 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.parkinglotsystem</groupId>
-            <artifactId>payment-service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!--<dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
-        </dependency>-->
+        </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
+            <groupId>com.parkinglotsystem</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.parkinglotsystem</groupId>
+            <artifactId>parking-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
     </dependencies>
 

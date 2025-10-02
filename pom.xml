@@ -25,10 +25,10 @@
 		<module>common</module>
 		<module>auth-service</module>
 		<module>customer-service</module>
+		<module>vehicle-services</module>
 		<module>parking-core</module>
 		<module>payment-service</module>
 		<module>ticket-service</module>
-		<module>reservation-service</module>
 		<module>session-service</module>
 		<module>reporting-service</module>
 		<module>user-service</module>
@@ -36,6 +36,7 @@
 		<module>edge-gateway</module>
 		<module>edge-gateway/vehicle-service</module>
 		<module>config-server</module>
+
 
 	</modules>
 
