@@ -152,6 +152,27 @@ services:
       - SPRING_MAIL_PASSWORD=secret
     depends_on:
       - kafka
+  eureka-server:
+    image: your/eureka-server:latest
+    build: ./eureka-server
+    ports:
+      - "8761:8761"
+
+  edge-gateway:
+      build: ./edge-gateway
+      ports:
+        - "8080:8080"
+      environment:
+        - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+        - AUTH_JWKS_URI=http://auth-service:8080/.well-known/jwks.json
+      depends_on:
+        - eureka-server
+        - auth-service
+        - parking-service
+        - reservation-service
+        - payment-service
+        - notification-service
+        - reporting-service
 
   reporting-service:
     build: reporting-service/Dockerfile
@@ -171,4 +192,5 @@ networks:
 
 volumes:
   postgres-data:
+
 

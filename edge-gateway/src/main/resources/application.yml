@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: edge-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - AddRequestHeader=X-Request-Start, #{T(java.time.Instant).now()}
+        - RemoveResponseHeader=Server
+      discovery:
+        locator:
+          enabled: true    # dynamically load all routes from discovery
+          lower-case-service-id: true
+      routes:
+        # Static examples (optional overrides)
+        - id: websocket-notification
+          uri: lb://notification-service
+          predicates:
+            - Path=/ws-notifications/**
+          filters:
+            - PreserveHostHeader
+            - RewritePath=/ws-notifications/(?<segment>.*), /ws-notifications/${segment}
+
+        - id: reporting-fallback
+          uri: lb://reporting-service
+          predicates:
+            - Path=/api/reports/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: reportingCB
+                fallbackUri: forward:/fallback/reporting
+
+# Resilience4j configuration (circuit breaker)
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 50
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+    instances:
+      reportingCB:
+        baseConfig: default
+
+# OAuth2 resource server for JWT validation (use your Auth service JWKS)
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${AUTH_JWKS_URI:http://auth-service:8080/.well-known/jwks.json}
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+# Optional Redis for rate limiter (configure if using RequestRateLimiter)
+  redis:
+    host: ${REDIS_HOST:redis}
+    port: ${REDIS_PORT:6379}
+
