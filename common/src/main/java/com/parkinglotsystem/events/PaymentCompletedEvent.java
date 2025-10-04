@@ -21,4 +21,7 @@ public class PaymentCompletedEvent {
     private String currency;           // Currency, e.g., INR
     private PaymentStatus status;      // SUCCESS / FAILED
     private LocalDateTime timestamp;   // Event creation time
+
+    public PaymentCompletedEvent(Long reservationId, Long parkingSessionId, String string, Double amount, LocalDateTime now) {
+    }
 }
