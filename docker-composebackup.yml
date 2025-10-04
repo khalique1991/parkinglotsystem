@@ -1,0 +1,69 @@
+services:
+  vault:
+    image: hashicorp/vault:1.16.2
+    container_name: vault-dev
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+    command: "server -dev -dev-root-token-id=root"
+    networks:
+      - parking-net
+
+  postgres:
+    image: postgres:15
+    container_name: parking-postgres
+    environment:
+      POSTGRES_DB: parkingdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    networks:
+      - parking-net
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  auth-service:
+    build:
+      context: .       # MUST be project root so Docker sees all modules
+      dockerfile: auth-service/Dockerfile
+    container_name: auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: root
+    depends_on:
+      - vault
+      - postgres
+    ports:
+      - "8081:8081"
+    networks:
+      - parking-net
+
+  customer-service:
+    build:
+      context: .       # MUST be project root so Docker sees all modules
+      dockerfile: customer-service/Dockerfile
+    container_name: customer-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: root
+    depends_on:
+      - vault
+      - postgres
+      - auth-service
+    ports:
+      - "8088:8088"
+    networks:
+      - parking-net
+
+networks:
+  parking-net:
+
+volumes:
+  postgres-data:
