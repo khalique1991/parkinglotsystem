@@ -1,4 +1,9 @@
+version: "3.9"
+
 services:
+  # ==========================
+  # Infra Services
+  # ==========================
   vault:
     image: hashicorp/vault:1.16.2
     container_name: vault-dev
@@ -12,7 +17,6 @@ services:
     command: "server -dev -dev-root-token-id=root"
     networks:
       - parking-net
-
   postgres:
     image: postgres:15
     container_name: parking-postgres
@@ -26,78 +30,167 @@ services:
       - parking-net
     volumes:
       - postgres-data:/var/lib/postgresql/data
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.0
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.14.0
+    container_name: logstash
+    depends_on:
+      - kafka
+      - elasticsearch
+    ports:
+      - "5044:5044"   # beats input
+      - "9600:9600"   # monitoring API
+    volumes:
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline
+    environment:
+      - LS_JAVA_OPTS=-Xms512m -Xmx512m
+
+  # ==========================
+  # Microservices
+  # ==========================
 
   auth-service:
-    build:
-      context: .       # MUST be project root so Docker sees all modules
-      dockerfile: auth-service/Dockerfile
+    build: auth-service/Dockerfile
     container_name: auth-service
+    ports:
+      - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      VAULT_ADDR: http://vault:8200
-      VAULT_TOKEN: root
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
     depends_on:
-      - vault
-      - postgres
+      - kafka
+      - elasticsearch
+
+  parking-service:
+    build: parking-service/Dockerfile
+    container_name: parking-service
     ports:
       - "8081:8081"
-    networks:
-      - parking-net
-
-  customer-service:
-    build:
-      context: .       # MUST be project root so Docker sees all modules
-      dockerfile: customer-service/Dockerfile
-    container_name: customer-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      VAULT_ADDR: http://vault:8200
-      VAULT_TOKEN: root
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      - vault
-      - postgres
-      - auth-service
-    ports:
-      - "8088:8088"
-    networks:
-      - parking-net
+      - kafka
 
+  reservation-service:
+    build: ticket-service/Dockerfile
+    container_name: ticket-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+
+  payment-service:
+    build: payment-service/Dockerfile
+    container_name: payment-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+
+  notification-service:
+    build: notification-service/Dockerfile
+    container_name: notification-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_MAIL_HOST=www.parkinglotsystem.com
+      - SPRING_MAIL_PORT=587
+      - SPRING_MAIL_USERNAME=mkhalique1991@gmail.com
+      - SPRING_MAIL_PASSWORD=secret
+    depends_on:
+      - kafka
+  eureka-server:
+    image: your/eureka-server:latest
+    build: ./eureka-server
+    ports:
+      - "8761:8761"
+
+  edge-gateway:
+      build: ./edge-gateway
+      ports:
+        - "8080:8080"
+      environment:
+        - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+        - AUTH_JWKS_URI=http://auth-service:8080/.well-known/jwks.json
+      depends_on:
+        - eureka-server
+        - auth-service
+        - parking-service
+        - reservation-service
+        - payment-service
+        - notification-service
+        - reporting-service
+
+  reporting-service:
+    build: reporting-service/Dockerfile
+    container_name: reporting-service
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      - kafka
+      - elasticsearch
+      - logstash
 networks:
   parking-net:
 
 volumes:
   postgres-data:
 
-  elasticsearch:
-      image: docker.elastic.co/elasticsearch/elasticsearch:8.12.1
-      container_name: elasticsearch
-      environment:
-        - discovery.type=single-node
-        - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      ports:
-        - "9200:9200"
-      networks:
-        - elk
 
-  kibana:
-      image: docker.elastic.co/kibana/kibana:8.12.1
-      container_name: kibana
-      environment:
-        - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      ports:
-        - "5601:5601"
-      networks:
-        - elk
-
-  logstash:
-      image: docker.elastic.co/logstash/logstash:8.12.1
-      container_name: logstash
-      volumes:
-        - ./logstash/pipeline/:/usr/share/logstash/pipeline/
-      ports:
-        - "5044:5044"
-      networks:
-        - elk
-
-  networks:
-    elk:

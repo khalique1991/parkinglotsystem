@@ -2,6 +2,7 @@ package com.parkinglotsystem.listener;
 
 import com.parkinglotsystem.entity.PaymentReport;
 import com.parkinglotsystem.entity.ReservationReport;
+import com.parkinglotsystem.enums.PaymentStatus;
 import com.parkinglotsystem.events.PaymentCompletedEvent;
 import com.parkinglotsystem.events.ParkingSessionCreatedEvent;
 import com.parkinglotsystem.repository.PaymentReportRepository;
@@ -31,7 +32,7 @@ public class ReportingEventListener {
             report.setAmount(event.getAmount());
             report.setCurrency("INR");
             report.setTransactionId(event.getTransactionId());
-            report.setStatus(event.getPaymentStatus().name());
+            report.setStatus(PaymentStatus.SUCCESS.name());
             report.setTimestamp(event.getTimestamp());
 
             paymentReportRepository.save(report);

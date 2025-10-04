@@ -24,8 +24,7 @@ public class PaymentService {
                 parkingSessionId,
                 UUID.randomUUID().toString(),  // generate unique transactionId
                 amount,
-                LocalDateTime.now(),
-                null
+                LocalDateTime.now()
         );
 
         // Publish event to Kafka
