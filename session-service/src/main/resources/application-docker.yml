@@ -1,0 +1,18 @@
+server:
+  port: 8088
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://session-db:5432/sessiondb}
+    username: ${SPRING_DATASOURCE_USERNAME:session}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+
+# Optional: Elasticsearch URL if you want session-service to index sessions
+elasticsearch:
+  url: ${ELASTICSEARCH_URL:http://elasticsearch:9200}

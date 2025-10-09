@@ -4,6 +4,29 @@ services:
   # ==========================
   # Infra Services
   # ==========================
+  user-db:
+    image: postgres:15
+    container_name: user-db
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  session-db:
+      image: postgres:15
+      container_name: session-db
+      environment:
+        POSTGRES_DB: sessiondb
+        POSTGRES_USER: session
+        POSTGRES_PASSWORD: password
+      volumes:
+        - session-db-data:/var/lib/postgresql/data
+      ports:
+        - "5434:5432"
   vault:
     image: hashicorp/vault:1.16.2
     container_name: vault-dev
@@ -174,6 +197,35 @@ services:
         - notification-service
         - reporting-service
 
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8087:8087"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://user-db:5432/userdb
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+      - user-db
+
+  session-service:
+    build: ./session-service
+    container_name: session-service
+    ports:
+      - "8088:8088"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://session-db:5432/sessiondb
+      - SPRING_DATASOURCE_USERNAME=session
+      - SPRING_DATASOURCE_PASSWORD=password
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - kafka
+      - session-db
   reporting-service:
     build: reporting-service/Dockerfile
     container_name: reporting-service
@@ -191,6 +243,8 @@ networks:
   parking-net:
 
 volumes:
+  user-db-data:
+  session-db-data:
   postgres-data:
 
 
