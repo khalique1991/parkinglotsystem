@@ -1,38 +1,50 @@
-import { useEffect, useState } from "react";
-import { getAvailableSpots } from "../services/parkingService";
+import React, { useEffect, useState } from 'react'
+import ParkingCard from '../components/ParkingCard'
+import { getSlots, reserveSlot, releaseSlot } from '../services/parkingService'
 
-function ParkingLot() {
-  const [spots, setSpots] = useState([]);
+export default function ParkingLot() {
+  const [slots, setSlots] = useState([])
 
   useEffect(() => {
-    async function fetchSpots() {
-      try {
-        const data = await getAvailableSpots(1); // Lot ID = 1
-        setSpots(data);
-      } catch (err) {
-        console.error("Error fetching spots:", err);
-      }
+    fetchSlots()
+  }, [])
+
+  async function fetchSlots() {
+    try {
+      const data = await getSlots()
+      setSlots(data)
+    } catch (err) {
+      console.error(err)
+      alert('Failed to load slots')
     }
-    fetchSpots();
-  }, []);
+  }
+
+  async function handleReserve(id) {
+    try {
+      await reserveSlot(id)
+      fetchSlots()
+    } catch (err) {
+      alert('Failed to reserve: ' + err.message)
+    }
+  }
+
+  async function handleRelease(id) {
+    try {
+      await releaseSlot(id)
+      fetchSlots()
+    } catch (err) {
+      alert('Failed to release: ' + err.message)
+    }
+  }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Available Parking Spots</h2>
-      <ul className="grid grid-cols-3 gap-4">
-        {spots.map((spot) => (
-          <li
-            key={spot.id}
-            className="border p-4 rounded-lg shadow hover:bg-gray-100"
-          >
-            <p>Spot: {spot.spotNumber}</p>
-            <p>Type: {spot.type}</p>
-            <p>Status: {spot.occupied ? "Occupied" : "Available"}</p>
-          </li>
+    <div>
+      <h1 className="text-2xl font-semibold mb-4">Parking Lot</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {slots.map(s => (
+          <ParkingCard key={s.id} slot={s} onReserve={handleReserve} onRelease={handleRelease} />
         ))}
-      </ul>
+      </div>
     </div>
-  );
+  )
 }
-
-export default ParkingLot;

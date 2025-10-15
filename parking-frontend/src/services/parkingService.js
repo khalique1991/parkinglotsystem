@@ -1,11 +1,16 @@
-import api from "./api";
+import api from './api'
 
-export const getAvailableSpots = async (lotId) => {
-  const response = await api.get(`/parking/lots/${lotId}/available-spots`);
-  return response.data;
-};
+export async function getSlots() {
+  const res = await api.get('/parking/slots')
+  return res.data
+}
 
-export const createParkingLot = async (lot) => {
-  const response = await api.post("/parking/parkinglots", lot);
-  return response.data;
-};
+export async function reserveSlot(id) {
+  const res = await api.post(`/parking/slots/${id}/reserve`)
+  return res.data
+}
+
+export async function releaseSlot(id) {
+  const res = await api.post(`/parking/slots/${id}/release`)
+  return res.data
+}
