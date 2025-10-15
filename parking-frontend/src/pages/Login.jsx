@@ -1,26 +1,33 @@
-function Login() {
+import React, { useState } from 'react'
+import useAuthStore from '../store/authStore'
+import { useNavigate } from 'react-router-dom'
+import { loginUser } from '../services/authService'
+
+export default function Login() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const login = useAuthStore(state => state.login)
+  const navigate = useNavigate()
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    try {
+      const data = await loginUser({ email, password })
+      login(data.user)
+      navigate('/dashboard')
+    } catch (err) {
+      alert('Login failed: ' + (err?.response?.data?.message || err.message))
+    }
+  }
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-6 w-80">
-        <h2 className="text-2xl font-bold text-center mb-4 text-blue-600">Login</h2>
-        <form>
-          <input
-            type="text"
-            placeholder="Username"
-            className="w-full px-3 py-2 mb-3 border rounded-lg focus:outline-none"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full px-3 py-2 mb-3 border rounded-lg focus:outline-none"
-          />
-          <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-            Login
-          </button>
-        </form>
-      </div>
+    <div className="max-w-md mx-auto mt-12 bg-white p-6 rounded shadow">
+      <h2 className="text-2xl mb-4">Login</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input className="w-full border px-3 py-2" placeholder="email" value={email} onChange={e => setEmail(e.target.value)} />
+        <input className="w-full border px-3 py-2" type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)} />
+        <button className="w-full bg-blue-600 text-white py-2 rounded">Login</button>
+      </form>
     </div>
   )
 }
-
-export default Login
