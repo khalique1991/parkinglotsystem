@@ -1,10 +1,9 @@
-import LoginForm from "../components/LoginForm";
-
+import Container from '../components/Layout/Container'
 export default function Home() {
   return (
-    <div className="max-w-md mx-auto mt-20 p-4 border rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Parking App Login</h1>
-      <LoginForm />
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
+      <p>Welcome to Parking Admin. Use the sidebar to navigate modules.</p>
     </div>
-  );
+  )
 }
