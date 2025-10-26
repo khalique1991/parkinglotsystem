@@ -49,7 +49,8 @@ export const useDeleteVehicle = () => {
     }
   }, { onSuccess: () => qc.invalidateQueries(['vehicles']) });
 };
-*/
+*//*
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 const USE_MOCK = true;
 
@@ -116,5 +117,79 @@ export const useDeleteVehicle = () => {
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['vehicles'] }),
+  });
+};
+*/
+// src/features/vehicles/useVehicle.js
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "../../api";
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+
+// ✅ Fetch all vehicles by customer
+export const useVehiclesByCustomer = (customerId) =>
+  useQuery({
+    queryKey: ["vehicles", customerId],
+    queryFn: async () => {
+      if (!customerId) return [];
+      if (USE_MOCK) {
+        const m = await import("./vehicles.mock.js");
+        return m.fetchVehiclesByCustomerMock(customerId);
+      } else {
+        return api.get(`/vehicle/customer/${customerId}`);
+      }
+    },
+    enabled: !!customerId,
+    staleTime: 60 * 1000,
+  });
+
+// ✅ Alias for easy import
+export const useVehicles = useVehiclesByCustomer;
+
+// ✅ Create vehicle
+export const useCreateVehicle = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload) => {
+      if (USE_MOCK) {
+        const m = await import("./vehicles.mock.js");
+        return m.createVehicleMock(payload);
+      } else {
+        return api.post("/vehicle", payload);
+      }
+    },
+    onSuccess: (_, payload) => qc.invalidateQueries({ queryKey: ["vehicles", payload.customerId] }),
+  });
+};
+
+// ✅ Update vehicle
+export const useUpdateVehicle = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }) => {
+      if (USE_MOCK) {
+        const m = await import("./vehicles.mock.js");
+        return m.updateVehicleMock(id, payload);
+      } else {
+        return api.put(`/vehicle/${id}`, payload);
+      }
+    },
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ["vehicles", vars.payload.customerId] }),
+  });
+};
+
+// ✅ Delete vehicle
+export const useDeleteVehicle = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, customerId }) => {
+      if (USE_MOCK) {
+        const m = await import("./vehicles.mock.js");
+        return m.deleteVehicleMock(id);
+      } else {
+        return api.delete(`/vehicle/${id}`);
+      }
+    },
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ["vehicles", vars.customerId] }),
   });
 };

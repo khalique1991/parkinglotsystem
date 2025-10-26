@@ -3,7 +3,7 @@ package com.parkinglotsystem.listener;
 
 
 import com.parkinglotsystem.events.ParkingSessionCreatedEvent;
-import com.parkinglotsystem.service.ReservationService;
+import com.parkinglotsystem.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ParkingEventListener {
 
-    private final ReservationService reservationService;
+    private final TicketService ticketService;
 
     @KafkaListener(
             topics = "parking_session_created",
@@ -25,6 +25,6 @@ public class ParkingEventListener {
         log.info("🎟 Received ParkingSessionCreatedEvent: {}", event);
 
         // Convert event → ReservationRequestDTO internally
-        reservationService.createReservationFromParkingSession(event);
+        ticketService.createReservationFromParkingSession(event);
     }
 }

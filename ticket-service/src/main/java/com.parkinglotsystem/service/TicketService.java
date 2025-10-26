@@ -1,12 +1,12 @@
 package com.parkinglotsystem.service;
 
-import com.parkinglotsystem.dto.ReservationRequestDTO;
-import com.parkinglotsystem.dto.ReservationResponseDTO;
+import com.parkinglotsystem.dto.TicketRequestDTO;
+import com.parkinglotsystem.dto.TicketResponseDTO;
 import com.parkinglotsystem.entity.Reservation;
 import com.parkinglotsystem.enums.ReservationStatus;
 import com.parkinglotsystem.events.ParkingSessionCreatedEvent;
-import com.parkinglotsystem.mapper.ReservationMapper;
-import com.parkinglotsystem.repository.ReservationRepository;
+import com.parkinglotsystem.mapper.TicketMapper;
+import com.parkinglotsystem.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.parkinglotsystem.mapper.ReservationMapper.mapToDTO;
+import static com.parkinglotsystem.mapper.TicketMapper.mapToDTO;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ReservationService {
+public class TicketService {
 
-    private final ReservationRepository reservationRepository;
+    private final TicketRepository ticketRepository;
 
-    public ReservationResponseDTO createReservation(ReservationRequestDTO request) {
+    public TicketResponseDTO createReservation(TicketRequestDTO request) {
         Reservation reservation = new Reservation();
         reservation.setParkingSessionId(request.getParkingSessionId());
         reservation.setCustomerId(request.getCustomerId());
@@ -35,35 +35,35 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.PENDING);
         reservation.setCreatedAt(LocalDateTime.now());
 
-        Reservation saved = reservationRepository.save(reservation);
+        Reservation saved = ticketRepository.save(reservation);
         log.info("🎟 Created reservation: {}", saved.getId());
 
         return mapToDTO(saved);
     }
 
-    public ReservationResponseDTO updateReservationStatus(Long id, ReservationStatus status) {
-        Reservation reservation = reservationRepository.findById(id)
+    public TicketResponseDTO updateReservationStatus(Long id, ReservationStatus status) {
+        Reservation reservation = ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found"));
 
         reservation.setStatus(status);
-        Reservation updated = reservationRepository.save(reservation);
+        Reservation updated = ticketRepository.save(reservation);
         log.info("✅ Updated reservation {} to {}", id, status);
 
         return mapToDTO(updated);
     }
 
-    public List<ReservationResponseDTO> getAllReservations() {
-        return reservationRepository.findAll()
+    public List<TicketResponseDTO> getAllReservations() {
+        return ticketRepository.findAll()
                 .stream()
-                .map(ReservationMapper::mapToDTO)
+                .map(TicketMapper::mapToDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<ReservationResponseDTO> getReservationById(Long id) {
-        return reservationRepository.findById(id).map(ReservationMapper::mapToDTO);
+    public Optional<TicketResponseDTO> getReservationById(Long id) {
+        return ticketRepository.findById(id).map(TicketMapper::mapToDTO);
     }
-    public ReservationResponseDTO createReservationFromParkingSession(ParkingSessionCreatedEvent event) {
-        ReservationRequestDTO dto = new ReservationRequestDTO();
+    public TicketResponseDTO createReservationFromParkingSession(ParkingSessionCreatedEvent event) {
+        TicketRequestDTO dto = new TicketRequestDTO();
         dto.setParkingSessionId(event.getParkingSessionId());
         dto.setCustomerId(event.getCustomerId()); // null if event has no customerId
         dto.setStartTime(event.getStartTime());

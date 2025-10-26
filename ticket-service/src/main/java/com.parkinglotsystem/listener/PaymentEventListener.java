@@ -3,7 +3,7 @@ package com.parkinglotsystem.listener;
 
 import com.parkinglotsystem.enums.ReservationStatus;
 import com.parkinglotsystem.events.PaymentCompletedEvent;
-import com.parkinglotsystem.service.ReservationService;
+import com.parkinglotsystem.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentEventListener {
 
-    private final ReservationService reservationService;
+    private final TicketService ticketService;
 
     @KafkaListener(
             topics = "payment_completed",
@@ -25,7 +25,7 @@ public class PaymentEventListener {
         log.info("💰 Received PaymentCompletedEvent: {}", event);
 
         // Update reservation status to PAID
-        reservationService.updateReservationStatus(
+        ticketService.updateReservationStatus(
                 event.getReservationId(),
                 ReservationStatus.PAID
         );
