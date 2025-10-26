@@ -6,6 +6,11 @@ import com.parkinglotsystem.entity.Customer;
 import com.parkinglotsystem.exception.DuplicateCustomerException;
 import com.parkinglotsystem.mapper.CustomerMapper;
 import com.parkinglotsystem.repository.CustomerRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,5 +52,36 @@ public class CustomerService {
             throw new RuntimeException("Customer not found");
         }
         customerRepository.deleteById(id);
+    }
+
+
+    public Page<CustomerResponseDTO> getAllCustomers(int page, int size, String sort, String search) {
+        // ✅ Parse sort param like "firstName,asc"
+        String[] sortParts = sort.split(",");
+        String sortField = sortParts[0];
+        Sort.Direction sortDir = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDir, sortField));
+
+        Page<Customer> customerPage;
+
+        // ✅ Search across name and email
+        if (search != null && !search.trim().isEmpty()) {
+            customerPage = customerRepository
+                    .findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                            search, search, search, pageable);
+        } else {
+            customerPage = customerRepository.findAll(pageable);
+        }
+
+        // ✅ Convert to DTOs
+        return customerPage.map(this::convertToDTO);
+    }
+    private CustomerResponseDTO convertToDTO(Customer customer) {
+        CustomerResponseDTO dto = new CustomerResponseDTO();
+        BeanUtils.copyProperties(customer, dto);
+        return dto;
     }
 }

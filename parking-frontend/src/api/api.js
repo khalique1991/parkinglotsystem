@@ -17,6 +17,7 @@ export const bookParkingSpot = async (spotId, userId) => {
 */
 // src/api/api.js
 
+/*
 export const loginUser = async ({ email, password }) => {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 500));
@@ -49,3 +50,45 @@ export const bookParkingSpot = async (spotId, userId) => {
   console.log(`Booked spot ${spotId} for user ${userId}`);
   return { data: { success: true } };
 };
+*/
+
+
+
+
+// src/utils/api.js
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080/api";
+
+const api = {
+  get: async (url) => {
+    const res = await fetch(`${API_BASE}${url}`, {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("API GET error");
+    return res.json();
+  },
+  post: async (url, data) => {
+    const res = await fetch(`${API_BASE}${url}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("API POST error");
+    return res.json();
+  },
+  put: async (url, data) => {
+    const res = await fetch(`${API_BASE}${url}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("API PUT error");
+    return res.json();
+  },
+  delete: async (url) => {
+    const res = await fetch(`${API_BASE}${url}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("API DELETE error");
+    return res.json();
+  },
+};
+
+export default api;

@@ -108,7 +108,7 @@ export default function SessionsList() {
  */
 import React, { useState } from 'react';
 import { useSessions, useCreateSession, useUpdateSession, useDeleteSession } from './useSession';
-import { useVehicles } from '../vehicles/useVehicle';
+import { useVehicles } from "../vehicles/useVehicle";
 
 export default function SessionsList() {
   const { data: sessions, isLoading } = useSessions();
