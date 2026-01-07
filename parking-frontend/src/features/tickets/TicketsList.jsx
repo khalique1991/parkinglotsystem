@@ -66,6 +66,7 @@ export default function TicketsList() {
     <div className="p-6 space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold text-gray-800">Ticket Management</h1>
+
         <div className="flex gap-3 items-center">
           <input
             type="text"
