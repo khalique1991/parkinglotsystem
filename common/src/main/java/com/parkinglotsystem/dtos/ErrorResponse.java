@@ -6,9 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
- * Standardized error response.
+ * Standardized error response for consistent error handling across all microservices.
  */
 @Data
 @Builder
@@ -19,4 +20,9 @@ public class ErrorResponse {
     private String message;
     private LocalDateTime timestamp;
     private String path;
+    private String traceId;
+    @Builder.Default
+    private Map<String, String> errors = null;
+    @Builder.Default
+    private String status = "ERROR";
 }

@@ -28,7 +28,6 @@ public class Payment {
 
     private String transactionId;
 
-    @Lob
     private String gatewayResponse;
 
     private LocalDateTime createdAt = LocalDateTime.now();
