@@ -18,44 +18,43 @@ export default function ParkingForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="p-6 bg-white shadow rounded max-w-lg mx-auto">
-      <h2 className="text-lg font-semibold mb-4">Add Parking Lot</h2>
+    <form onSubmit={handleSubmit(onSubmit)} className="p-10 bg-white shadow-lg rounded-2xl border border-gray-200 max-w-xl mx-auto mt-12 flex flex-col gap-4">
+      <h2 className="text-2xl font-extrabold text-blue-700 mb-4">Add Parking Lot</h2>
 
       <label className="block mb-3">
-        Name
+        <span className="block text-gray-700 font-medium mb-1">Name</span>
         <input
           {...register('name', { required: true })}
-          className="border p-2 rounded w-full"
+          className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600"
         />
-        {errors.name && <span className="text-red-500">Name is required</span>}
+        {errors.name && <span className="text-red-500 text-sm">Name is required</span>}
       </label>
 
       <label className="block mb-3">
-        Capacity
+        <span className="block text-gray-700 font-medium mb-1">Capacity</span>
         <input
           type="number"
           {...register('capacity', { required: true })}
-          className="border p-2 rounded w-full"
+          className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600"
         />
+        {errors.capacity && <span className="text-red-500 text-sm">Capacity is required</span>}
       </label>
 
       <label className="block mb-3">
-        Status
-        <select {...register('status')} className="border p-2 rounded w-full">
+        <span className="block text-gray-700 font-medium mb-1">Status</span>
+        <select {...register('status')} className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600">
           <option value="AVAILABLE">AVAILABLE</option>
           <option value="FULL">FULL</option>
           <option value="CLOSED">CLOSED</option>
         </select>
       </label>
 
-      <div className="flex gap-2 mt-4">
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">
-          Save
-        </button>
+      <div className="flex gap-4 mt-6">
+        <button className="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-800 transition">Save</button>
         <button
           type="button"
           onClick={() => nav('/parking')}
-          className="bg-gray-200 px-4 py-2 rounded"
+          className="bg-gray-200 px-6 py-2 rounded-lg font-semibold shadow hover:bg-gray-300 transition"
         >
           Cancel
         </button>

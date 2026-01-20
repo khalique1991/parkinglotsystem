@@ -38,9 +38,9 @@ export default function ParkingLot() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-4">Parking Lot</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="max-w-5xl mx-auto mt-12 p-8 bg-white border border-gray-200 rounded-2xl shadow-lg">
+      <h1 className="text-3xl font-extrabold text-blue-700 mb-6">Parking Lot</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {slots.map(s => (
           <ParkingCard key={s.id} slot={s} onReserve={handleReserve} onRelease={handleRelease} />
         ))}
