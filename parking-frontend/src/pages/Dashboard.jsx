@@ -10,8 +10,8 @@ export default function Dashboard() {
   if (!user) return <Navigate to="/" />;
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-4 border rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+    <div className="max-w-3xl mx-auto mt-12 p-8 bg-white border border-gray-200 rounded-2xl shadow-lg flex flex-col gap-8">
+      <h1 className="text-3xl font-extrabold text-blue-700 mb-2">Dashboard</h1>
       <ParkingList />
       <BookingForm userId={user?.id} />
     </div>
