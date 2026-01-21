@@ -1,7 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-const USE_MOCK = true;
+import * as api from "./reports.api";
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
-export const useReports = () => useQuery({
-  queryKey: ["reports"],
-  queryFn: async () => USE_MOCK ? (await import("./reports.mock.js")).fetchReportsMock() : null,
+export const useUsageReport = (params) => useQuery({
+  queryKey: ["usageReport", params],
+  queryFn: async () => USE_MOCK
+    ? (await import("./reports.mock.js")).fetchUsageReportMock(params)
+    : api.fetchUsageReport(params),
+});
+
+export const useRevenueReport = (params) => useQuery({
+  queryKey: ["revenueReport", params],
+  queryFn: async () => USE_MOCK
+    ? (await import("./reports.mock.js")).fetchRevenueReportMock(params)
+    : api.fetchRevenueReport(params),
 });

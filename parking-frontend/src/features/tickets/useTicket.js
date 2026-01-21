@@ -1,5 +1,6 @@
 // src/features/tickets/useTickets.js
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import * as api from "./tickets.api";
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
 
@@ -11,8 +12,7 @@ export const useTickets = () =>
         const m = await import("./tickets.mock.js");
         return (await m.fetchTicketsMock()).data; // ✅ return .data
       } else {
-        const res = await fetch("/api/tickets");
-        return await res.json();
+        return api.fetchTickets();
       }
     },
   });
@@ -25,12 +25,7 @@ export const useCreateTicket = () => {
         const m = await import("./tickets.mock.js");
         return (await m.createTicketMock(payload)).data;
       } else {
-        const res = await fetch("/api/tickets", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        return await res.json();
+        return api.createTicket(payload);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
@@ -40,17 +35,12 @@ export const useCreateTicket = () => {
 export const useUpdateTicket = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, payload }) => {
+    mutationFn: async ({ id, status }) => {
       if (USE_MOCK) {
         const m = await import("./tickets.mock.js");
-        return (await m.updateTicketMock(id, payload)).data;
+        return (await m.updateTicketMock(id, { status })).data;
       } else {
-        const res = await fetch(`/api/tickets/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        return await res.json();
+        return api.updateTicketStatus(id, status);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
@@ -65,8 +55,7 @@ export const useDeleteTicket = () => {
         const m = await import("./tickets.mock.js");
         return (await m.deleteTicketMock(id)).data;
       } else {
-        await fetch(`/api/tickets/${id}`, { method: "DELETE" });
-        return true;
+        return api.deleteTicket(id);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),
@@ -81,8 +70,7 @@ export const useCancelTicket = () => {
         const m = await import("./tickets.mock.js");
         return (await m.cancelTicketMock(id)).data;
       } else {
-        const res = await fetch(`/api/tickets/${id}/cancel`, { method: "PUT" });
-        return await res.json();
+        return api.cancelTicket(id);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tickets"] }),

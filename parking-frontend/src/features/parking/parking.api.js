@@ -17,3 +17,13 @@ export const updateParkingLot = async ({ id, payload }) => {
   const res = await axios.put(`${API_BASE_URL}/parking-lots/${id}`, payload);
   return res.data;
 };
+
+export const createParkingLot = async (payload) => {
+  const res = await axios.post(`${API_BASE_URL}/parking-lots`, payload);
+  return res.data;
+};
+
+export const deleteParkingLot = async (id) => {
+  const res = await axios.delete(`${API_BASE_URL}/parking-lots/${id}`);
+  return res.data;
+};

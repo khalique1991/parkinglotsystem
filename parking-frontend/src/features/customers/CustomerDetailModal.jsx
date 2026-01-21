@@ -13,7 +13,7 @@ export default function CustomerDetailModal({ customer, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateCustomer.mutateAsync({ id: customer.customerId, payload: formData });
+      await updateCustomer.mutateAsync({ id: customer.id, payload: formData });
       onClose();
     } catch (err) {
       console.error(err);
