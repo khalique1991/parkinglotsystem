@@ -1,66 +1,17 @@
-/*
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-const USE_MOCK = true;
+import * as api from './payments.api';
 
-export const usePayments = () => useQuery(['payments'], async () => {
-  if (USE_MOCK) {
-    const m = await import('./payments.mock.js');
-    return (await m.fetchPaymentsMock()).data;
-  }
-});
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
-export const usePayment = (id) => useQuery(['payment', id], async () => {
-  if (!id) return null;
-  if (USE_MOCK) {
-    const m = await import('./payments.mock.js');
-    return (await m.fetchPaymentMock(id)).data;
-  }
-}, { enabled: !!id });
-
-export const useCreatePayment = () => {
-  const qc = useQueryClient();
-  return useMutation(async (payload) => {
-    if (USE_MOCK) {
-      const m = await import('./payments.mock.js');
-      return (await m.createPaymentMock(payload)).data;
-    }
-  }, { onSuccess: () => qc.invalidateQueries(['payments']) });
-};
-
-export const useUpdatePayment = () => {
-  const qc = useQueryClient();
-  return useMutation(async ({ id, payload }) => {
-    if (USE_MOCK) {
-      const m = await import('./payments.mock.js');
-      return (await m.updatePaymentMock(id, payload)).data;
-    }
-  }, { onSuccess: (_, vars) => {
-    qc.invalidateQueries(['payments']);
-    qc.invalidateQueries(['payment', vars.id]);
-  }});
-};
-
-export const useDeletePayment = () => {
-  const qc = useQueryClient();
-  return useMutation(async (id) => {
-    if (USE_MOCK) {
-      const m = await import('./payments.mock.js');
-      return (await m.deletePaymentMock(id)).data;
-    }
-  }, { onSuccess: () => qc.invalidateQueries(['payments']) });
-};
-*/
-
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-const USE_MOCK = true;
-
-export const usePayments = () =>
+export const usePayments = (params) =>
   useQuery({
-    queryKey: ['payments'],
+    queryKey: ['payments', params],
     queryFn: async () => {
       if (USE_MOCK) {
         const m = await import('./payments.mock.js');
         return (await m.fetchPaymentsMock()).data;
+      } else {
+        return api.fetchPayments(params);
       }
     },
   });
@@ -73,6 +24,8 @@ export const usePayment = (id) =>
       if (USE_MOCK) {
         const m = await import('./payments.mock.js');
         return (await m.fetchPaymentMock(id)).data;
+      } else {
+        return api.fetchPayment(id);
       }
     },
     enabled: !!id,
@@ -85,6 +38,8 @@ export const useCreatePayment = () => {
       if (USE_MOCK) {
         const m = await import('./payments.mock.js');
         return (await m.createPaymentMock(payload)).data;
+      } else {
+        return api.createPayment(payload);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['payments'] }),
@@ -114,6 +69,21 @@ export const useDeletePayment = () => {
       if (USE_MOCK) {
         const m = await import('./payments.mock.js');
         return (await m.deletePaymentMock(id)).data;
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['payments'] }),
+  });
+};
+
+export const useRefundPayment = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }) => {
+      if (USE_MOCK) {
+        const m = await import('./payments.mock.js');
+        return (await m.refundPaymentMock(id, payload)).data;
+      } else {
+        return api.refundPayment(id, payload);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['payments'] }),

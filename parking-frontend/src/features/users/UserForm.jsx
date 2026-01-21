@@ -18,14 +18,33 @@ export default function UserForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="p-4 bg-white rounded shadow max-w-md">
-      <h2 className="text-lg font-semibold mb-4">Create User</h2>
-      <label className="block mb-2">Name<input {...register('name', { required: true })} className="border p-2 rounded w-full" /></label>
-      {errors.name && <div className="text-red-600">Required</div>}
-      <label className="block mb-2">Email<input {...register('email', { required: true })} className="border p-2 rounded w-full" /></label>
-      <label className="block mb-2">Role<select {...register('role', { required: true })} className="border p-2 rounded w-full"><option>USER</option><option>OPERATOR</option><option>ADMIN</option></select></label>
-      <label className="block mb-4">Password<input type="password" {...register('password', { required: true, minLength: 6 })} className="border p-2 rounded w-full" /></label>
-      <div className="flex gap-2"><button className="bg-blue-600 text-white px-3 py-1 rounded">Create</button><button type="button" onClick={() => nav('/users')} className="bg-gray-200 px-3 py-1 rounded">Cancel</button></div>
+    <form onSubmit={handleSubmit(onSubmit)} className="p-10 bg-white shadow-lg rounded-2xl border border-gray-200 max-w-xl mx-auto mt-12 flex flex-col gap-4">
+      <h2 className="text-2xl font-extrabold text-blue-700 mb-4">Create User</h2>
+      <label className="block mb-2">
+        <span className="block text-gray-700 font-medium mb-1">Name</span>
+        <input {...register('name', { required: true })} className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600" />
+        {errors.name && <div className="text-red-600 text-sm">Required</div>}
+      </label>
+      <label className="block mb-2">
+        <span className="block text-gray-700 font-medium mb-1">Email</span>
+        <input {...register('email', { required: true })} className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600" />
+      </label>
+      <label className="block mb-2">
+        <span className="block text-gray-700 font-medium mb-1">Role</span>
+        <select {...register('role', { required: true })} className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600">
+          <option>USER</option>
+          <option>OPERATOR</option>
+          <option>ADMIN</option>
+        </select>
+      </label>
+      <label className="block mb-4">
+        <span className="block text-gray-700 font-medium mb-1">Password</span>
+        <input type="password" {...register('password', { required: true, minLength: 6 })} className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600" />
+      </label>
+      <div className="flex gap-4 mt-6">
+        <button className="bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-800 transition">Create</button>
+        <button type="button" onClick={() => nav('/users')} className="bg-gray-200 px-6 py-2 rounded-lg font-semibold shadow hover:bg-gray-300 transition">Cancel</button>
+      </div>
     </form>
   )
 }

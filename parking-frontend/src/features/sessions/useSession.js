@@ -1,64 +1,7 @@
-/*
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-const USE_MOCK = true; // set false to use real API
+import * as api from './sessions.api';
 
-// Fetch all sessions
-export const useSessions = () => useQuery(['sessions'], async () => {
-  if (USE_MOCK) {
-    const m = await import('./sessions.mock.js');
-    return (await m.fetchSessionsMock()).data;
-  }
-});
-
-// Fetch a single session by ID
-export const useSession = (id) => useQuery(['session', id], async () => {
-  if (!id) return null;
-  if (USE_MOCK) {
-    const m = await import('./sessions.mock.js');
-    return (await m.fetchSessionMock(id)).data;
-  }
-}, { enabled: !!id });
-
-// Create a new session
-export const useCreateSession = () => {
-  const qc = useQueryClient();
-  return useMutation(async (payload) => {
-    if (USE_MOCK) {
-      const m = await import('./sessions.mock.js');
-      return (await m.createSessionMock(payload)).data;
-    }
-  }, { onSuccess: () => qc.invalidateQueries(['sessions']) });
-};
-
-// Update a session
-export const useUpdateSession = () => {
-  const qc = useQueryClient();
-  return useMutation(async ({ id, payload }) => {
-    if (USE_MOCK) {
-      const m = await import('./sessions.mock.js');
-      return (await m.updateSessionMock(id, payload)).data;
-    }
-  }, {
-    onSuccess: (_, vars) => {
-      qc.invalidateQueries(['sessions']);
-      qc.invalidateQueries(['session', vars.id]);
-    }
-  });
-};
-
-// Delete a session
-export const useDeleteSession = () => {
-  const qc = useQueryClient();
-  return useMutation(async (id) => {
-    if (USE_MOCK) {
-      const m = await import('./sessions.mock.js');
-      return (await m.deleteSessionMock(id)).data;
-    }
-  }, { onSuccess: () => qc.invalidateQueries(['sessions']) });
-};
-*/
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-const USE_MOCK = true;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 export const useSessions = () =>
   useQuery({
@@ -67,6 +10,8 @@ export const useSessions = () =>
       if (USE_MOCK) {
         const m = await import('./sessions.mock.js');
         return (await m.fetchSessionsMock()).data;
+      } else {
+        return api.fetchSessions();
       }
     },
   });
@@ -79,6 +24,8 @@ export const useSession = (id) =>
       if (USE_MOCK) {
         const m = await import('./sessions.mock.js');
         return (await m.fetchSessionMock(id)).data;
+      } else {
+        return api.fetchSession(id);
       }
     },
     enabled: !!id,
@@ -91,6 +38,8 @@ export const useCreateSession = () => {
       if (USE_MOCK) {
         const m = await import('./sessions.mock.js');
         return (await m.createSessionMock(payload)).data;
+      } else {
+        return api.createSession(payload);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['sessions'] }),
@@ -104,6 +53,8 @@ export const useUpdateSession = () => {
       if (USE_MOCK) {
         const m = await import('./sessions.mock.js');
         return (await m.updateSessionMock(id, payload)).data;
+      } else {
+        return api.updateSession(id, payload);
       }
     },
     onSuccess: (_, vars) => {
@@ -120,6 +71,8 @@ export const useDeleteSession = () => {
       if (USE_MOCK) {
         const m = await import('./sessions.mock.js');
         return (await m.deleteSessionMock(id)).data;
+      } else {
+        return api.deleteSession(id);
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['sessions'] }),
